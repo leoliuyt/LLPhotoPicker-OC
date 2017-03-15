@@ -35,7 +35,8 @@
     WEAKSELF(weakSelf);
     [LLPhotoPickerService requestAuthorization:^() {
         LLPhotoPickerViewController *vc = [[LLPhotoPickerViewController alloc] init];
-        vc.maximumNumberOfSelection = 1;
+        vc.showType = ELLPickerShowTypeDefault;
+        vc.maximumNumberOfSelection = 3;
         vc.modalPresentationStyle = UIModalPresentationFullScreen;
         vc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         vc.pickerDelegate = weakSelf;
@@ -49,14 +50,16 @@
     WEAKSELF(weakSelf);
     [[LLPhotoPickerService shared] requestOriginImageForAsset:asset completion:^(UIImage *aImage, NSDictionary *aDict, BOOL isDegraded) {
         if (!isDegraded) {
-            LLCustomCropViewController *cropVc = [[LLCustomCropViewController alloc] init];
-            cropVc.type = ELLSeletPhotoTypeAlbum;
-            cropVc.cropScale = 1.;
-            cropVc.sourceImage = aImage;
-            cropVc.delegate = weakSelf;
-            [pickerVC pushViewController:cropVc animated:YES];
+            weakSelf.coverImageView.image = aImage;
+//            LLCustomCropViewController *cropVc = [[LLCustomCropViewController alloc] init];
+//            cropVc.type = ELLSeletPhotoTypeAlbum;
+//            cropVc.cropScale = 1.;
+//            cropVc.sourceImage = aImage;
+//            cropVc.delegate = weakSelf;
+//            [pickerVC pushViewController:cropVc animated:YES];
         }
     }];
+    [pickerVC dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)imageCrop:(LLCustomCropViewController *)customCropVC didFinished:(UIImage *)editedImage {

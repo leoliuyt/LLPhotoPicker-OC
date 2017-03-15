@@ -11,7 +11,7 @@
 #import "JYAsynImageView.h"
 //#import "ArtImageService.h"
 
-#define asyn // 异步绘制暂时有问题
+#define asyn  // 异步绘制暂时有问题
 
 @interface JYImageScrollView ()<UIScrollViewDelegate>
 

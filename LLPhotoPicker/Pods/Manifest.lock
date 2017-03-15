@@ -1,0 +1,24 @@
+PODS:
+  - Masonry (1.0.2)
+  - ReactiveCocoa (2.5):
+    - ReactiveCocoa/UI (= 2.5)
+  - ReactiveCocoa/Core (2.5):
+    - ReactiveCocoa/no-arc
+  - ReactiveCocoa/no-arc (2.5)
+  - ReactiveCocoa/UI (2.5):
+    - ReactiveCocoa/Core
+  - YYAsyncLayer (1.0)
+
+DEPENDENCIES:
+  - Masonry (= 1.0.2)
+  - ReactiveCocoa (~> 2.5)
+  - YYAsyncLayer
+
+SPEC CHECKSUMS:
+  Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
+  ReactiveCocoa: e2db045570aa97c695e7aa97c2bcab222ae51f4a
+  YYAsyncLayer: df6b01ebc695c5f6b4c15dd5c23fa3e081eb25c0
+
+PODFILE CHECKSUM: 6d584074450aa525915f1345260cb04dbb6846bb
+
+COCOAPODS: 1.1.1

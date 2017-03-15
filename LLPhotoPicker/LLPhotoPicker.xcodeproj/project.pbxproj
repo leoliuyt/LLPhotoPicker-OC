@@ -35,8 +35,10 @@
 		6B43EF1E1E79315F0037C3FC /* JYImageScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B43EF1A1E79315F0037C3FC /* JYImageScrollView.m */; };
 		6B43EF1F1E79315F0037C3FC /* JYIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B43EF1C1E79315F0037C3FC /* JYIndicatorView.m */; };
 		6B43EF221E7932480037C3FC /* UIColor+LL.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B43EF211E7932480037C3FC /* UIColor+LL.m */; };
-		6B43EF281E7937D80037C3FC /* NSFileManager+Clean.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B43EF271E7937D80037C3FC /* NSFileManager+Clean.m */; };
 		6B43EF2A1E793F0D0037C3FC /* PhotoPicker.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B43EF291E793F0D0037C3FC /* PhotoPicker.xcassets */; };
+		9E9118871E7977EC001ABB8E /* NSFileManager+LL.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E9118861E7977EC001ABB8E /* NSFileManager+LL.m */; };
+		9E91188B1E79796A001ABB8E /* UIViewController+Hook.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E91188A1E79796A001ABB8E /* UIViewController+Hook.m */; };
+		9E91188E1E797BB7001ABB8E /* UIViewController+Nav.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E91188D1E797BB7001ABB8E /* UIViewController+Nav.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -95,10 +97,15 @@
 		6B43EF1C1E79315F0037C3FC /* JYIndicatorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JYIndicatorView.m; sourceTree = "<group>"; };
 		6B43EF201E7932480037C3FC /* UIColor+LL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+LL.h"; sourceTree = "<group>"; };
 		6B43EF211E7932480037C3FC /* UIColor+LL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+LL.m"; sourceTree = "<group>"; };
-		6B43EF261E7937D80037C3FC /* NSFileManager+Clean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Clean.h"; sourceTree = "<group>"; };
-		6B43EF271E7937D80037C3FC /* NSFileManager+Clean.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Clean.m"; sourceTree = "<group>"; };
 		6B43EF291E793F0D0037C3FC /* PhotoPicker.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = PhotoPicker.xcassets; sourceTree = "<group>"; };
 		84C7BD7A8C2328A1E3AD477F /* Pods-LLPhotoPicker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LLPhotoPicker.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LLPhotoPicker/Pods-LLPhotoPicker.debug.xcconfig"; sourceTree = "<group>"; };
+		9E9118851E7977EC001ABB8E /* NSFileManager+LL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+LL.h"; sourceTree = "<group>"; };
+		9E9118861E7977EC001ABB8E /* NSFileManager+LL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+LL.m"; sourceTree = "<group>"; };
+		9E9118881E7978B0001ABB8E /* LLSwizzlingDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LLSwizzlingDefine.h; sourceTree = "<group>"; };
+		9E9118891E79796A001ABB8E /* UIViewController+Hook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Hook.h"; sourceTree = "<group>"; };
+		9E91188A1E79796A001ABB8E /* UIViewController+Hook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Hook.m"; sourceTree = "<group>"; };
+		9E91188C1E797BB7001ABB8E /* UIViewController+Nav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Nav.h"; sourceTree = "<group>"; };
+		9E91188D1E797BB7001ABB8E /* UIViewController+Nav.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Nav.m"; sourceTree = "<group>"; };
 		BED02F245DD9940593F030CC /* libPods-LLPhotoPicker.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LLPhotoPicker.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -243,14 +250,19 @@
 			isa = PBXGroup;
 			children = (
 				6B43EF121E792E870037C3FC /* Category.h */,
-				6B43EF261E7937D80037C3FC /* NSFileManager+Clean.h */,
-				6B43EF271E7937D80037C3FC /* NSFileManager+Clean.m */,
+				9E9118881E7978B0001ABB8E /* LLSwizzlingDefine.h */,
+				9E9118851E7977EC001ABB8E /* NSFileManager+LL.h */,
+				9E9118861E7977EC001ABB8E /* NSFileManager+LL.m */,
 				6B43EF0E1E792B900037C3FC /* UICollectionView+Picker.h */,
 				6B43EF0F1E792B900037C3FC /* UICollectionView+Picker.m */,
 				6B43EF201E7932480037C3FC /* UIColor+LL.h */,
 				6B43EF211E7932480037C3FC /* UIColor+LL.m */,
 				6B33CF4D1E794C1B002D9CA9 /* UIImage+LL.h */,
 				6B33CF4E1E794C1B002D9CA9 /* UIImage+LL.m */,
+				9E9118891E79796A001ABB8E /* UIViewController+Hook.h */,
+				9E91188A1E79796A001ABB8E /* UIViewController+Hook.m */,
+				9E91188C1E797BB7001ABB8E /* UIViewController+Nav.h */,
+				9E91188D1E797BB7001ABB8E /* UIViewController+Nav.m */,
 			);
 			name = Category;
 			sourceTree = "<group>";
@@ -406,6 +418,9 @@
 				6B43EEE31E7929670037C3FC /* LLPhotoGroupModel.m in Sources */,
 				6B43EF0C1E792B4D0037C3FC /* LLPhotoPickerService.m in Sources */,
 				6B43EEF31E792A600037C3FC /* LLCustomCropViewController.m in Sources */,
+				9E9118871E7977EC001ABB8E /* NSFileManager+LL.m in Sources */,
+				9E91188E1E797BB7001ABB8E /* UIViewController+Nav.m in Sources */,
+				9E91188B1E79796A001ABB8E /* UIViewController+Hook.m in Sources */,
 				6B43EF1E1E79315F0037C3FC /* JYImageScrollView.m in Sources */,
 				6B43EECA1E79218B0037C3FC /* main.m in Sources */,
 				6B43EF031E792AF30037C3FC /* LLPhotoGroupCell.m in Sources */,
@@ -413,7 +428,6 @@
 				6B43EF101E792B900037C3FC /* UICollectionView+Picker.m in Sources */,
 				6B43EF221E7932480037C3FC /* UIColor+LL.m in Sources */,
 				6B33CF4F1E794C1B002D9CA9 /* UIImage+LL.m in Sources */,
-				6B43EF281E7937D80037C3FC /* NSFileManager+Clean.m in Sources */,
 				6B43EF1F1E79315F0037C3FC /* JYIndicatorView.m in Sources */,
 				6B43EF061E792B160037C3FC /* LLPhotoPreviewCell.m in Sources */,
 				6B43EF151E7930920037C3FC /* LLUtil.m in Sources */,

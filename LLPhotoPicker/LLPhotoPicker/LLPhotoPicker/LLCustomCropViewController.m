@@ -7,9 +7,8 @@
 //
 
 #import "LLCustomCropViewController.h"
-
-//#import "UIImage+LL.h"
 #import "LLTrimHoleView.h"
+
 static CGFloat kMarginTop = 20.;
 static CGFloat kMarginBottom = 72.;
 
@@ -162,12 +161,6 @@ static CGFloat kMarginBottom = 72.;
     
     return frame;
 }
-//
-//- (void)setNav{
-//
-//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"保存" style:UIBarButtonItemStylePlain target:self action:@selector(saveAction:)];
-//    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(cancelAction:)];
-//}
 
 - (void)saveAction:(id)sender
 {

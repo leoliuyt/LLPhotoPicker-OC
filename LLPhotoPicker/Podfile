@@ -7,5 +7,8 @@ target 'LLPhotoPicker' do
 
   # Pods for LLPhotoPicker
   pod 'Masonry','1.0.2'
+  pod 'ReactiveCocoa', '~> 2.5'
+  pod 'YYAsyncLayer'
+  # pod 'CHTCollectionViewWaterfallLayout', '~> 0.9.5'
 
 end

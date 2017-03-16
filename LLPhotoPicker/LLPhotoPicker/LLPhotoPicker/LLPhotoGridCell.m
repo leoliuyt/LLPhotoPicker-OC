@@ -7,7 +7,6 @@
 //
 
 #import "LLPhotoGridCell.h"
-
 #import "LLPhotoPickerConfig.h"
 #import "LLPhotoPickerService.h"
 
@@ -36,7 +35,7 @@
     
     [self.selectIconBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.right.equalTo(self.contentView);
-        make.width.height.equalTo(46.);
+        make.width.height.equalTo(40.);
     }];
 }
 

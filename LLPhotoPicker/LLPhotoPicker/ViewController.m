@@ -48,16 +48,14 @@
 {
     PHAsset *asset = photos.firstObject;
     WEAKSELF(weakSelf);
-    [[LLPhotoPickerService shared] requestOriginImageForAsset:asset completion:^(UIImage *aImage, NSDictionary *aDict, BOOL isDegraded) {
-        if (!isDegraded) {
-            weakSelf.coverImageView.image = aImage;
-//            LLCustomCropViewController *cropVc = [[LLCustomCropViewController alloc] init];
-//            cropVc.type = ELLSeletPhotoTypeAlbum;
-//            cropVc.cropScale = 1.;
-//            cropVc.sourceImage = aImage;
-//            cropVc.delegate = weakSelf;
-//            [pickerVC pushViewController:cropVc animated:YES];
-        }
+    [[LLPhotoPickerService shared] requestOriginImageForAsset:asset completion:^(UIImage *aImage) {
+        weakSelf.coverImageView.image = aImage;
+//        LLCustomCropViewController *cropVc = [[LLCustomCropViewController alloc] init];
+//        cropVc.type = ELLSeletPhotoTypeAlbum;
+//        cropVc.cropScale = 1.;
+//        cropVc.sourceImage = aImage;
+//        cropVc.delegate = weakSelf;
+//        [pickerVC pushViewController:cropVc animated:YES];
     }];
     [pickerVC dismissViewControllerAnimated:YES completion:nil];
 }

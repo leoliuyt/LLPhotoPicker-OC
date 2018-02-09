@@ -557,4 +557,16 @@ static char firstLetterArray[HANZI_COUNT] =
         [[UIApplication sharedApplication] openURL:url];
     }
 }
+
++ (void)synExecuteTimeOut:(NSTimeInterval)timeout executeBlock:(void(^)(void))executeBlock
+{
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        if (executeBlock) {
+            executeBlock();
+        }
+        dispatch_semaphore_signal(semaphore);
+    });
+    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)));
+}
 @end

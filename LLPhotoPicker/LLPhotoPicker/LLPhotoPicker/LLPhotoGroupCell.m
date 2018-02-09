@@ -68,8 +68,9 @@
     self.photoCountLabel.text = [NSString stringWithFormat:@"(%tu)",count];
     PHAsset *firstAsset = aCellContent.groupFetchResult.firstObject;
     if (firstAsset) {
-        [[LLPhotoPickerService shared] requestThumbnailImageForAsset:firstAsset size:CGSizeMake(90., 90.) completion:^(UIImage *image, NSDictionary *info, BOOL isDegraded) {
-            self.coverImageView.image = image;
+        WEAKSELF(weakSelf);
+        [[LLPhotoPickerService shared] requestLowQualityImageForAsset:firstAsset size:CGSizeMake(90, 90) exactSize:YES completion:^(UIImage *aImage, NSDictionary *aInfo, BOOL isDegraded) {
+            weakSelf.coverImageView.image = aImage;
         }];
     }
 }

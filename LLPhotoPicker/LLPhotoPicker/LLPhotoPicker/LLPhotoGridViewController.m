@@ -141,8 +141,8 @@ LLPhotoPreviewViewControllerDelegate>
                 
                 
                 dispatch_async(dispatch_get_global_queue(0, 0), ^{
-                    UIImage *originImage = [[LLPhotoPickerService shared] originImageForAsset:videoAsset];
-                    UIImage *thumImage = [[LLPhotoPickerService shared] thumbnailForAsset:videoAsset size:weakSelf.gridSize];
+                    UIImage *originImage = [[LLPhotoPickerService shared] synRequestOriginImageForAsset:videoAsset networkAccessAllowed:NO];
+                    UIImage *thumImage = [[LLPhotoPickerService shared] synRequestLowQualityImageForAsset:videoAsset targetSize:weakSelf.gridSize];
                     NSData* data = UIImageJPEGRepresentation(originImage,1);
                     [data writeToFile:videoCoverPath atomically:YES];
                     NSValue *coverImageSize = [NSValue valueWithCGSize:originImage.size];
@@ -413,11 +413,10 @@ LLPhotoPreviewViewControllerDelegate>
         asset = [self.fetchResult objectAtIndex:indexPath.row];
         cell.asset = asset;
         cell.representedAssetIdentifier = asset.localIdentifier;
-        [[LLPhotoPickerService shared] requestThumbnailImageForAsset:asset size:self.gridSize completion:^(UIImage *image, NSDictionary *info, BOOL isDegraded) {
-            NSLog(@"=====%@",info);
+        [[LLPhotoPickerService shared] requestLowQualityImageForAsset:asset size:self.gridSize exactSize:YES completion:^(UIImage *aImage, NSDictionary *aInfo, BOOL isDegraded) {
+            NSLog(@"=====%@",aInfo);
             if ([cell.representedAssetIdentifier isEqualToString:asset.localIdentifier]) {
-                //                UIImage *cornerimage = [image cornerImage:4.];
-                cell.photoImageView.image = image;
+                cell.photoImageView.image = aImage;
             }
         }];
         if ([LLPhotoPickerConfig shared].isMutableSelect) {

@@ -101,68 +101,48 @@
 }
 
 //MARK: 获取图片、视频
-- (UIImage *)originImageForAsset:(PHAsset *)asset targetSize:(CGSize)size {
+
+
+//MARK: 同步获取图片方法
+
+- (UIImage *)synRequestOriginImageForAsset:(PHAsset *)asset networkAccessAllowed:(BOOL)allowed {
     __block UIImage *resultImage;
-    PHImageRequestOptions *phImageRequestOptions = [[PHImageRequestOptions alloc] init];
+    PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
     //synchronous 设为 YES 时，deliveryMode 属性就会被忽略，并被当作HighQualityFormat 来处理
     //同步方法不要将networkAccessAllowed 设置YES
-    phImageRequestOptions.synchronous = YES;
-    phImageRequestOptions.networkAccessAllowed = NO;
-    phImageRequestOptions.resizeMode = PHImageRequestOptionsResizeModeExact;
-    [self.cacheManager requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFit options:phImageRequestOptions resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    requestOptions.synchronous = YES;
+    requestOptions.networkAccessAllowed = allowed;
+    if(!allowed){
+        [self.cacheManager requestImageForAsset:asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeDefault options:requestOptions resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+            resultImage = result;
+        }];
+        return resultImage;
+    } else {
+        WEAKSELF(weakSelf);
+        [LLUtil synExecuteTimeOut:3 executeBlock:^{
+            [weakSelf.cacheManager requestImageForAsset:asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeDefault options:requestOptions resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+                resultImage = result;
+            }];
+        }];
+        return resultImage;
+    }
+}
+
+- (UIImage *)synRequestLowQualityImageForAsset:(PHAsset *)asset targetSize:(CGSize)size
+{
+    __block UIImage *resultImage;
+    PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+    requestOptions.synchronous = NO;
+    requestOptions.networkAccessAllowed = YES;
+    requestOptions.resizeMode = PHImageRequestOptionsResizeModeExact;
+    requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
+    //在deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic，synchronous = NO 时 resultHandler第一次为同步调用，返回低质量图片
+    [self.cacheManager requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFill options:requestOptions resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         resultImage = result;
     }];
     return resultImage;
 }
 
-- (UIImage *)originImageForAsset:(PHAsset *)asset {
-    return [self originImageForAsset:asset targetSize:PHImageManagerMaximumSize];
-}
-
-- (NSInteger)requestOriginImageForAsset:(PHAsset *)asset completion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion
-{
-    return [self requestOriginImageForAsset:asset completion:completion withProgressHandler:nil];
-}
-
-- (NSInteger)requestOriginImageForAsset:(PHAsset *)asset completion:(void (^)(UIImage *, NSDictionary * ,BOOL isDegraded))completion withProgressHandler:(PHAssetImageProgressHandler)phProgressHandler {
-    NSString *ID = [self identifierWithAssset:asset targetSize:PHImageManagerMaximumSize];
-    if ([self.imageCache objectForKey:ID]) {
-        completion([self.imageCache objectForKey:ID], nil , NO);
-        return 0;
-    } else {
-        PHImageRequestOptions *imageRequestOptions = [[PHImageRequestOptions alloc] init];
-        imageRequestOptions.networkAccessAllowed = YES; // 允许访问网络
-        imageRequestOptions.resizeMode = PHImageRequestOptionsResizeModeFast;
-        imageRequestOptions.progressHandler = phProgressHandler;
-        return [self.cacheManager requestImageForAsset:asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeDefault options:imageRequestOptions resultHandler:^(UIImage *result, NSDictionary *info) {
-            // 排除取消，错误，低清图三种情况，即已经获取到了高清图时，把这张高清图缓存到 _previewImage 中
-            BOOL isDegraded = [[info objectForKey:PHImageResultIsDegradedKey] boolValue];
-            BOOL downloadFinined = ![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && !isDegraded;
-            if (downloadFinined) {
-                if (result) {
-                    [self.imageCache setObject:result forKey:ID];
-                }
-            }
-            if (completion) {
-                completion(result, info, isDegraded);
-            }
-        }];
-    }
-}
-
-- (NSInteger)requestImageDataForAsset:(PHAsset *)asset completion:(void(^)(NSData *__nullable imageData, UIImageOrientation orientation, NSDictionary *__nullable info, BOOL isDegraded))resultHandler
-{
-    //    PHImageRequestOptions *imageRequestOptions = [[PHImageRequestOptions alloc] init];
-    //    imageRequestOptions.networkAccessAllowed = YES; // 允许访问网络
-    //    imageRequestOptions.resizeMode = PHImageRequestOptionsResizeModeExact;
-    //    imageRequestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
-    //    if (completion) completion(resultImage,info,[[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
-    return [[PHImageManager defaultManager] requestImageDataForAsset:asset options:nil resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
-        NSLog(@"leoliu===requestData ==dataUTI = %@ orientation = %tu info = %@",dataUTI,orientation,info);
-        BOOL isDegraded = [[info objectForKey:PHImageResultIsDegradedKey] boolValue];
-        resultHandler(imageData,orientation,info,isDegraded);
-    }];
-}
 
 - (UIImage *)thumbnailForAsset:(PHAsset *)asset size:(CGSize)size {
     __block UIImage *resultImage;
@@ -180,80 +160,46 @@
     return resultImage;
 }
 
-- (NSInteger)requestThumbnailImageForAsset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion {
-    NSString *ID = [self identifierWithAssset:asset targetSize:size];
-    if ([self.imageCache objectForKey:ID]) {
-        completion([self.imageCache objectForKey:ID], nil,NO);
-        return 0;
-    } else {
-        PHImageRequestOptions *imageRequestOptions = [[PHImageRequestOptions alloc] init];
-        //        imageRequestOptions.resizeMode = PHImageRequestOptionsResizeModeFast;
-        //        imageRequestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
-        imageRequestOptions.resizeMode = PHImageRequestOptionsResizeModeFast;
-        // 在 PHImageManager 中，targetSize 等 size 都是使用 px 作为单位，因此需要对targetSize 中对传入的 Size 进行处理，宽高各自乘以 ScreenScale，从而得到正确的图片
-        return [self.cacheManager  requestImageForAsset:asset targetSize:CGSizeMake(size.width * [UIScreen mainScreen].scale, size.height * [UIScreen mainScreen].scale) contentMode:PHImageContentModeAspectFill options:imageRequestOptions resultHandler:^(UIImage *result, NSDictionary *info) {
-            // 排除取消，错误，低清图三种情况，即已经获取到了高清图时，把这张高清图缓存到 _previewImage 中
-            BOOL isDegraded = [[info objectForKey:PHImageResultIsDegradedKey] boolValue];
-            BOOL downloadFinined = ![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && !isDegraded;
-            if (downloadFinined) {
-                if (result) {
-                    [self.imageCache setObject:result forKey:ID];
-                }
-            }
-            if (completion) {
-                completion(result, info,isDegraded);
-            }
-        }];
-    }
-}
-
-- (UIImage *)previewImageForAsset:(PHAsset *)asset targetSize:(CGSize)size {
-    __block UIImage *resultImage;
-    PHImageRequestOptions *phImageRequestOptions = [[PHImageRequestOptions alloc] init];
-    phImageRequestOptions.synchronous = YES;
-    phImageRequestOptions.networkAccessAllowed = NO;
-    phImageRequestOptions.resizeMode = PHImageRequestOptionsResizeModeExact;
-    [self.cacheManager requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFit options:phImageRequestOptions resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        resultImage = result;
-    }];
-    return resultImage;
-}
-
-- (UIImage *)previewImageForAsset:(PHAsset *)asset {
-    return [self previewImageForAsset:asset targetSize:[UIScreen mainScreen].bounds.size];
-}
-
-- (NSInteger)requestPreviewImageForAsset:(PHAsset *)asset withCompletion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion
+- (NSInteger)requestOriginImageForAsset:(PHAsset *)asset completion:(void(^)(UIImage *aImage))completion
 {
-    return [self requestPreviewImageForAsset:asset withCompletion:completion withProgressHandler:nil];
+    PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+    requestOptions.networkAccessAllowed = YES; // 允许访问网络
+    requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    return [self.cacheManager requestImageForAsset:asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeDefault options:requestOptions resultHandler:^(UIImage *result, NSDictionary *info) {
+        if (completion) {
+            if (result && [result isKindOfClass:[UIImage class]]) {
+                completion(result);
+            } else {
+                completion(nil);
+            }
+        }
+    }];
 }
 
-- (NSInteger)requestPreviewImageForAsset:(PHAsset *)asset withCompletion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion withProgressHandler:(PHAssetImageProgressHandler)phProgressHandler {
-    CGSize size = [UIScreen mainScreen].bounds.size;
-    NSString *ID = [self identifierWithAssset:asset targetSize:size];
-    if ([self.imageCache objectForKey:ID]) {
-        completion([self.imageCache objectForKey:ID], nil,NO);
-        return 0;
-    } else {
+- (NSInteger)requestLowQualityImageForAsset:(PHAsset *)asset size:(CGSize)size exactSize:(BOOL)isExactSize completion:(void (^)(UIImage *aImage, NSDictionary *aInfo, BOOL isDegraded))completion {
+    PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
+    requestOptions.resizeMode = isExactSize ? PHImageRequestOptionsResizeModeExact : PHImageRequestOptionsResizeModeFast;
+    // 在 PHImageManager 中，targetSize 等 size 都是使用 px 作为单位，因此需要对targetSize 中对传入的 Size 进行处理，宽高各自乘以 ScreenScale，从而得到正确的图片
+    return [self.cacheManager  requestImageForAsset:asset targetSize:CGSizeMake(size.width * [UIScreen mainScreen].scale, size.height * [UIScreen mainScreen].scale) contentMode:PHImageContentModeAspectFill options:requestOptions resultHandler:^(UIImage *result, NSDictionary *info) {
+        // 排除取消，错误，低清图三种情况，即已经获取到了高清图时，把这张高清图缓存到 _previewImage 中
+        BOOL isDegraded = [[info objectForKey:PHImageResultIsDegradedKey] boolValue];
+        BOOL downloadFinined = ![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && !isDegraded;
+        if (completion) {
+            completion(result, info,downloadFinined);
+        }
+    }];
+}
+
+- (NSInteger)requestImageDataForAsset:(PHAsset *)asset completion:(void(^)(NSData * imageData, UIImageOrientation orientation, NSDictionary * info))resultHandler
+{
         PHImageRequestOptions *imageRequestOptions = [[PHImageRequestOptions alloc] init];
         imageRequestOptions.networkAccessAllowed = YES; // 允许访问网络
-        imageRequestOptions.progressHandler = phProgressHandler;
-        imageRequestOptions.resizeMode = PHImageRequestOptionsResizeModeFast;
-        return [self.cacheManager requestImageForAsset:asset targetSize:CGSizeMake(size.width, size.height) contentMode:PHImageContentModeAspectFit options:imageRequestOptions resultHandler:^(UIImage *result, NSDictionary *info) {
-            // 排除取消，错误，低清图三种情况，即已经获取到了高清图时，把这张高清图缓存到 _previewImage 中
-            BOOL isDegraded = [[info objectForKey:PHImageResultIsDegradedKey] boolValue];
-            BOOL downloadFinined = ![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && !isDegraded;
-            if (downloadFinined) {
-                if (result) {
-                    [self.imageCache setObject:result forKey:ID];
-                }
-            }
-            if (completion) {
-                completion(result, info,isDegraded);
-            }
-        }];
-    }
+    return [[PHImageManager defaultManager] requestImageDataForAsset:asset options:nil resultHandler:^(NSData * imageData, NSString * dataUTI, UIImageOrientation orientation, NSDictionary * info) {
+        NSLog(@"leoliu===requestData ==dataUTI = %@ orientation = %tu info = %@",dataUTI,orientation,info);
+        resultHandler(imageData,orientation,info);
+    }];
 }
+
 
 - (void)getOriginImageBytesFromAsset:(PHAsset *)asset completion:(void (^)(NSString *totalBytes))completion {
     __block NSInteger dataLength = 0;

@@ -171,9 +171,11 @@
     if (indexPath.row < self.fetchResult.count) {
         asset = [self.fetchResult objectAtIndex:indexPath.row];
         cell.representedAssetIdentifier = asset.localIdentifier;
-        [[LLPhotoPickerService shared] requestPreviewImageForAsset:asset withCompletion:^(UIImage *aImage, NSDictionary *info, BOOL isDegraded) {
-            if ([cell.representedAssetIdentifier isEqualToString:asset.localIdentifier]) {
-                [cell setImage:aImage];
+        __weak LLPhotoPreviewCell *weakCell = cell;
+        [[LLPhotoPickerService shared] requestLowQualityImageForAsset:asset size:[UIScreen mainScreen].bounds.size exactSize:NO completion:^(UIImage *aImage, NSDictionary *aInfo, BOOL isDegraded) {
+            __strong LLPhotoPreviewCell *strongCell = weakCell;
+            if ([strongCell.representedAssetIdentifier isEqualToString:asset.localIdentifier]) {
+                [strongCell setImage:aImage];
             }
         }];
     }

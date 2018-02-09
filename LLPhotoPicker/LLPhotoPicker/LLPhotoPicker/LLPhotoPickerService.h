@@ -28,9 +28,8 @@
 //权限判断 是否授权
 + (void)requestAuthorization:(void (^)())authorSuccessHandler;
 
-/// Asset 的原图（包含系统相册“编辑”功能处理后的效果）
-- (UIImage *)originImageForAsset:(PHAsset *)asset targetSize:(CGSize)size;
-- (UIImage *)originImageForAsset:(PHAsset *)asset;
+//有可能会返回nil 如果是从icloud中的图片，会返回nil
+- (UIImage *)synRequestOriginImageForAsset:(PHAsset *)asset networkAccessAllowed:(BOOL)allowed;
 
 /**
  *  异步请求 Asset 的原图
@@ -38,17 +37,7 @@
  *  @param completion 完成请求后调用的 block，参数中包含了请求的原图以及图片信息，这个 block 会被多次调用，其中第一次调用获取到的尺寸很小的低清图，然后不断调用，直接获取到高清图
  *  @return 返回请求图片的请求 id
  */
-- (NSInteger)requestOriginImageForAsset:(PHAsset *)asset completion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion;
-
-/**
- *  异步请求 Asset 的原图，包含了系统照片“编辑”功能处理后的效果（剪裁，旋转和滤镜等），可能会有网络请求
- *  @param asset 请求资源
- *  @param completion        完成请求后调用的 block，参数中包含了请求的原图以及图片信息，在 iOS 8.0 或以上版本中，
- *                           这个 block 会被多次调用，其中第一次调用获取到的尺寸很小的低清图，然后不断调用，直接获取到高清图，
- *  @param phProgressHandler 处理请求进度的 handler，不在主线程上执行，在 block 中修改 UI 时注意需要手工放到主线程处理。
- *  @return 返回请求图片的请求  id
- */
-- (NSInteger)requestOriginImageForAsset:(PHAsset *)asset completion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion withProgressHandler:(PHAssetImageProgressHandler)phProgressHandler;
+- (NSInteger)requestOriginImageForAsset:(PHAsset *)asset completion:(void(^)(UIImage *aImage))completion;
 
 /**
  *  Asset 的缩略图
@@ -56,57 +45,24 @@
  *  @param size 指定返回的缩略图的大小
  *  @return Asset 的缩略图
  */
-- (UIImage *)thumbnailForAsset:(PHAsset *)asset size:(CGSize)size;
+- (UIImage *)synRequestLowQualityImageForAsset:(PHAsset *)asset targetSize:(CGSize)size;
 
 /**
- *  异步请求 Asset 的缩略图，不会产生网络请求
- *  @param asset 请求资源
- *  @param size       指定返回的缩略图的大小
- *  @param completion 完成请求后调用的 block，参数中包含了请求的缩略图以及图片信息，在 iOS 8.0 或以上版本中，这个 block 会被多次调用，
- *                    其中第一次调用获取到的尺寸很小的低清图，然后不断调用，直接获取到高清图
- *  @return 返回请求图片的请求 id
- */
-- (NSInteger)requestThumbnailImageForAsset:(PHAsset *)asset size:(CGSize)size completion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion;
+ 异步请求 Asset 的缩略图
 
-
-/**
- *  Asset 的缩略图
- *  @param asset 请求资源
- *  @return Asset 的缩略图
+ @param asset 请求资源
+ @param size 定返回的缩略图的大小
+ @param isExactSize 是否确切的返回指定缩率图大小
+ @param completion  完成请求后调用的 block，参数中包含了请求的缩略图以及图片信息，这个 block 会被多次调用，
+ *                  其中第一次调用获取到的尺寸很小的低清图，然后不断调用，直接获取到高清图
+ @return 返回请求图片的请求 id
  */
-- (UIImage *)previewImageForAsset:(PHAsset *)asset;
-
-/**
- *  Asset 的预览图
- *  @param asset 请求资源
- *  @param size 指定返回的预览图的大小
- *  @return Asset 的预览图
- */
-- (UIImage *)previewImageForAsset:(PHAsset *)asset targetSize:(CGSize)size;
-
-/**
- *  异步请求 Asset 的预览图，不会产生网络请求
- *  @param asset 请求资源
- *  @param completion 完成请求后调用的 block，参数中包含了请求的预览图以及图片信息，在 iOS 8.0 或以上版本中，这个 block 会被多次调用，
- *                    其中第一次调用获取到的尺寸很小的低清图，然后不断调用，直接获取到高清图
- *  @return 返回请求图片的请求 id
- */
-- (NSInteger)requestPreviewImageForAsset:(PHAsset *)asset withCompletion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion;
-
-/**
- *  异步请求 Asset 的预览图，不会产生网络请求
- *  @param asset 请求资源
- *  @param completion 完成请求后调用的 block，参数中包含了请求的预览图以及图片信息，在 iOS 8.0 或以上版本中，这个 block 会被多次调用，
- *                    其中第一次调用获取到的尺寸很小的低清图，然后不断调用，直接获取到高清图
- *  @param phProgressHandler 处理请求进度的 handler，不在主线程上执行，在 block 中修改 UI 时注意需要手工放到主线程处理。
- *  @return 返回请求图片的请求 id
- */
-- (NSInteger)requestPreviewImageForAsset:(PHAsset *)asset withCompletion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraged))completion withProgressHandler:(PHAssetImageProgressHandler)phProgressHandler;
+- (NSInteger)requestLowQualityImageForAsset:(PHAsset *)asset size:(CGSize)size exactSize:(BOOL)isExactSize completion:(void (^)(UIImage *aImage, NSDictionary *aInfo, BOOL isDegraded))completion;
 
 /*
  获取图片data
  */
-- (NSInteger)requestImageDataForAsset:(PHAsset *)asset completion:(void(^)(NSData * imageData, UIImageOrientation orientation, NSDictionary * info, BOOL isDegraded))resultHandler;
+- (NSInteger)requestImageDataForAsset:(PHAsset *)asset completion:(void(^)(NSData * imageData, UIImageOrientation orientation, NSDictionary * info))resultHandler;
 
 /*
  获取原图大小

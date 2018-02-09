@@ -43,4 +43,13 @@ NSString* CheckString(NSString *aString);
 +(NSURL *)createDirectoriesIfNeededAtURL:(NSURL *)aURL;
 + (void)openSystemSetting;
 
+
+/**
+ 同步操作，超时活着block执行完成后，再执行后续操作
+
+ @param timeout 超时时间 单位s
+ @param executeBlock 执行的操作
+ */
++ (void)synExecuteTimeOut:(NSTimeInterval)timeout executeBlock:(void(^)(void))executeBlock;
+
 @end
